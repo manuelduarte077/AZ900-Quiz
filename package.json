@@ -6,10 +6,10 @@
     "build": "./gradlew :composeApp:wasmJsBrowserDistribution",
     "dev": "./gradlew :composeApp:wasmJsBrowserDevelopmentRun",
     "clean": "./gradlew clean",
-    "vercel-build": "./gradlew :composeApp:wasmJsBrowserDistribution"
+    "vercel-build": "./gradlew clean && ./gradlew :composeApp:wasmJsBrowserDistribution"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "22.x"
   },
   "keywords": [
     "kotlin",

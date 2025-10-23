@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "2.2.20"
 }
 
 kotlin {
@@ -24,12 +25,28 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
+            
+            // Kotlin Serialization
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+            
+            // Ktor Client
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
         }
+        
+        jsMain.dependencies {
+            implementation(libs.ktor.client.js)
+        }
+        
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
+        }
+        
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }

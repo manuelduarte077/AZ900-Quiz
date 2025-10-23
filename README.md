@@ -1,42 +1,54 @@
-This is a Kotlin Multiplatform project targeting Web.
+# AZ-900 Quiz Application
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+Una aplicación web interactiva para practicar el examen de certificación AZ-900 de Microsoft Azure, construida con Kotlin Multiplatform y Compose Multiplatform.
 
-### Build and Run Web Application
+## 🚀 Características
 
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :composeApp:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-    ```
+- **428 preguntas reales** del examen AZ-900
+- **Carga dinámica** desde API externa
+- **Interfaz moderna** con Material Design 3
+- **Optimizado para WebAssembly** (Wasm)
+- **Responsive design** para todos los dispositivos
+- **Manejo de errores** robusto
+- **Pantallas de carga** y feedback visual
 
----
+## 📦 Instalación y Desarrollo
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+### Desarrollo Local
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+```bash
+# Ejecutar en modo desarrollo
+./gradlew :composeApp:wasmJsBrowserDevelopmentRun
+```
+
+
+## 📁 Estructura del Proyecto
+
+```
+AZ900-Quiz/
+├── composeApp/
+│   ├── src/
+│   │   ├── webMain/kotlin/
+│   │   │   └── dev/donmanuel/az900quiz/
+│   │   │       ├── data/           # Modelos de datos
+│   │   │       ├── service/        # Servicios (API)
+│   │   │       ├── screens/        # Pantallas de la app
+│   │   │       ├── composables/    # Componentes reutilizables
+│   │   │       └── App.kt          # Punto de entrada
+│   │   └── webMain/resources/       # Recursos web
+│   └── build.gradle.kts           # Configuración Gradle
+├── gradle/
+│   └── libs.versions.toml         # Versiones de dependencias
+├── vercel.json                    # Configuración Vercel
+├── package.json                   # Scripts npm
+└── README.md                      # Documentación
+```
+
+## 🔧 Configuración
+
+### API Endpoint
+
+La aplicación consume preguntas desde:
+```
+https://raw.githubusercontent.com/manuelduarte077/AZ900-Quiz/refs/heads/main/api/questions.json
+```

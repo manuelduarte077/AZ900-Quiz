@@ -1,0 +1,25 @@
+{
+  "name": "az900-quiz",
+  "version": "1.0.0",
+  "description": "AZ-900 Certification Quiz Application built with Kotlin Multiplatform",
+  "scripts": {
+    "build": "./gradlew :composeApp:wasmJsBrowserDistribution",
+    "dev": "./gradlew :composeApp:wasmJsBrowserDevelopmentRun",
+    "clean": "./gradlew clean",
+    "vercel-build": "./gradlew :composeApp:wasmJsBrowserDistribution"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "kotlin",
+    "multiplatform",
+    "compose",
+    "wasm",
+    "quiz",
+    "azure",
+    "az900"
+  ],
+  "author": "Don Manuel",
+  "license": "MIT"
+}

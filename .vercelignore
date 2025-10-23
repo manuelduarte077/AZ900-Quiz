@@ -14,7 +14,6 @@ composeApp/build/
 .idea/
 *.iml
 .vscode/
-.kotlin
 
 # OS
 .DS_Store
@@ -29,7 +28,3 @@ node_modules/
 # Temporary files
 *.tmp
 *.temp
-
-# Vercel
-.vercel/
-.vercel

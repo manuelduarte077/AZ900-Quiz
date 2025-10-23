@@ -1,45 +1,103 @@
 package dev.donmanuel.az900quiz
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.painterResource
-
-import az900_quiz.composeapp.generated.resources.Res
-import az900_quiz.composeapp.generated.resources.compose_multiplatform
+import dev.donmanuel.az900quiz.data.QuizScreen
+import dev.donmanuel.az900quiz.screens.ErrorScreen
+import dev.donmanuel.az900quiz.screens.LoadingScreen
+import dev.donmanuel.az900quiz.screens.ResultScreen
+import dev.donmanuel.az900quiz.screens.StartScreen
+import dev.donmanuel.az900quiz.service.QuestionLoader
 
 @Composable
 fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+    val viewModel = remember { QuizViewModel() }
+    var currentScreen by remember { mutableStateOf(QuizScreen.START) }
+    var isLoading by remember { mutableStateOf(true) }
+    var loadError by remember { mutableStateOf<String?>(null) }
+
+    // Load questions when app starts
+    LaunchedEffect(Unit) {
+        try {
+            val questions = QuestionLoader.loadQuestions(5)
+
+            if (questions.isNotEmpty()) {
+                viewModel.loadQuestions(questions)
+                isLoading = false
+            } else {
+                loadError = "No se pudieron cargar las preguntas"
+                isLoading = false
             }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+        } catch (e: Exception) {
+            loadError = "Error al cargar las preguntas: ${e.message}"
+            isLoading = false
+        }
+    }
+
+    MaterialTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            when {
+                isLoading -> {
+                    LoadingScreen()
+                }
+
+                loadError != null -> {
+                    ErrorScreen(
+                        error = loadError!!,
+                        onRetry = {
+                            isLoading = true
+                            loadError = null
+                        }
+                    )
+                }
+
+                else -> {
+                    when (currentScreen) {
+                        QuizScreen.START -> {
+                            StartScreen(
+                                onStartQuiz = {
+                                    viewModel.startQuiz()
+                                    currentScreen = QuizScreen.QUIZ
+                                }
+                            )
+                        }
+
+                        QuizScreen.QUIZ -> {
+                            dev.donmanuel.az900quiz.screens.QuizScreen(
+                                viewModel = viewModel,
+                                onBackToStart = {
+                                    currentScreen = QuizScreen.START
+                                }
+                            )
+
+                            // Check if quiz is completed
+                            LaunchedEffect(viewModel.quizState.quizCompleted) {
+                                if (viewModel.quizState.quizCompleted) {
+                                    currentScreen = QuizScreen.RESULT
+                                }
+                            }
+                        }
+
+                        QuizScreen.RESULT -> {
+                            ResultScreen(
+                                score = viewModel.quizState.score,
+                                totalQuestions = viewModel.quizState.questions.size,
+                                onRestartQuiz = {
+                                    viewModel.restartQuiz()
+                                    currentScreen = QuizScreen.START
+                                },
+                                onBackToStart = {
+                                    currentScreen = QuizScreen.START
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

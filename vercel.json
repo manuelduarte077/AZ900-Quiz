@@ -1,10 +1,15 @@
 {
   "version": 2,
-  "outputDirectory": "composeApp/build/dist/wasmJs/productionExecutable",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/$1"
+      "src": "composeApp/build/dist/wasmJs/productionExecutable/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/composeApp/build/dist/wasmJs/productionExecutable/$1"
     }
   ]
 }

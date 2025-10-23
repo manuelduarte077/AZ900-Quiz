@@ -21,7 +21,6 @@ Una aplicación web interactiva para practicar el examen de certificación AZ-90
 ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
 ```
 
-
 ## 📁 Estructura del Proyecto
 
 ```

@@ -17,7 +17,8 @@ data class QuizState(
     val selectedAnswer: String? = null,
     val showResult: Boolean = false,
     val quizCompleted: Boolean = false,
-    val timeRemaining: Int = 0
+    val timeRemaining: Int = 0,
+    val selectedQuestionCount: Int = 10
 )
 
 enum class QuizScreen {

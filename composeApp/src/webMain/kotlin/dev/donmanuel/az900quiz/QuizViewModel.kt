@@ -14,25 +14,28 @@ class QuizViewModel {
     var currentScreen by mutableStateOf(QuizScreen.START)
         private set
     
-    fun loadQuestions(questions: List<Question>) {
+    fun loadQuestions(questions: List<Question>, questionCount: Int = 10) {
+        val limitedQuestions = questions.shuffled().take(questionCount)
         quizState = quizState.copy(
-            questions = questions,
+            questions = limitedQuestions,
             currentQuestionIndex = 0,
             score = 0,
             selectedAnswer = null,
             showResult = false,
-            quizCompleted = false
+            quizCompleted = false,
+            selectedQuestionCount = questionCount
         )
     }
     
-    fun startQuiz() {
+    fun startQuiz(questionCount: Int = 10) {
         currentScreen = QuizScreen.QUIZ
         quizState = quizState.copy(
             currentQuestionIndex = 0,
             score = 0,
             selectedAnswer = null,
             showResult = false,
-            quizCompleted = false
+            quizCompleted = false,
+            selectedQuestionCount = questionCount
         )
     }
     
@@ -54,7 +57,6 @@ class QuizViewModel {
         val nextIndex = quizState.currentQuestionIndex + 1
         
         if (nextIndex >= quizState.questions.size) {
-            // Quiz completed
             quizState = quizState.copy(quizCompleted = true)
             currentScreen = QuizScreen.RESULT
         } else {

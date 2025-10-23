@@ -18,14 +18,16 @@ fun App() {
     var currentScreen by remember { mutableStateOf(QuizScreen.START) }
     var isLoading by remember { mutableStateOf(true) }
     var loadError by remember { mutableStateOf<String?>(null) }
+    var allQuestions by remember { mutableStateOf<List<dev.donmanuel.az900quiz.data.Question>>(emptyList()) }
 
     // Load questions when app starts
     LaunchedEffect(Unit) {
         try {
-            val questions = QuestionLoader.loadQuestions(5)
+            val questions = QuestionLoader.loadQuestions(428) // Load all available questions
 
             if (questions.isNotEmpty()) {
-                viewModel.loadQuestions(questions)
+                allQuestions = questions
+                viewModel.loadQuestions(questions, 10) // Default to 10 questions
                 isLoading = false
             } else {
                 loadError = "No se pudieron cargar las preguntas"
@@ -61,8 +63,9 @@ fun App() {
                     when (currentScreen) {
                         QuizScreen.START -> {
                             StartScreen(
-                                onStartQuiz = {
-                                    viewModel.startQuiz()
+                                onStartQuiz = { questionCount ->
+                                    viewModel.loadQuestions(allQuestions, questionCount)
+                                    viewModel.startQuiz(questionCount)
                                     currentScreen = QuizScreen.QUIZ
                                 }
                             )

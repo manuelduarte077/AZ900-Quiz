@@ -1,6 +1,7 @@
 package dev.donmanuel.az900quiz.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -48,128 +52,197 @@ fun QuizScreen(
         return
     }
 
-    Column(
+    Box(
         modifier = modifier.fillMaxSize()
     ) {
-        // Top App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = "AZ-900 Quiz",
-                    fontWeight = FontWeight.SemiBold
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = onBackToStart) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        )
-
-        // Progress Bar
-        LinearProgressIndicator(
-            progress = { viewModel.progress },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.primary,
-            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Question Counter
-        Text(
-            text = "Pregunta ${quizState.currentQuestionIndex + 1} de ${quizState.questions.size}",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Question Card
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            shape = RoundedCornerShape(16.dp)
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp)
-            ) {
-                Text(
-                    text = currentQuestion.question,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth()
+            // Top App Bar
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "AZ-900 Quiz",
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackToStart) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack, 
+                            contentDescription = "Volver",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
+            )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Answer Options
-                currentQuestion.options.forEach { (key, value) ->
-                    AnswerOption(
-                        optionKey = key,
-                        optionText = value,
-                        isSelected = quizState.selectedAnswer == key,
-                        isCorrect = currentQuestion.answer == key,
-                        showResult = quizState.showResult,
-                        onClick = {
-                            if (!quizState.showResult) {
-                                viewModel.selectAnswer(key)
-                            }
-                        }
+            // Progress Section
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    // Progress Bar
+                    LinearProgressIndicator(
+                        progress = { viewModel.progress },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
+
+                    // Question Counter
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Pregunta ${quizState.currentQuestionIndex + 1} de ${quizState.questions.size}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        
+                        Text(
+                            text = "${(viewModel.progress * 100).toInt()}%",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
+            // Main Content
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = 800.dp, min = 320.dp)
+                        .padding(horizontal = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Question Card
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(28.dp)
+                        ) {
+                            Text(
+                                text = currentQuestion.question,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Start,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                lineHeight = androidx.compose.ui.unit.TextUnit.Unspecified
+                            )
 
-        // Action Buttons
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if (quizState.showResult) {
-                Button(
-                    onClick = {
-                        if (viewModel.isLastQuestion) {
-                            viewModel.nextQuestion() // This will trigger result screen
-                        } else {
-                            viewModel.nextQuestion()
+                            Spacer(modifier = Modifier.height(28.dp))
+
+                            // Answer Options
+                            currentQuestion.options.forEach { (key, value) ->
+                                AnswerOption(
+                                    optionKey = key,
+                                    optionText = value,
+                                    isSelected = quizState.selectedAnswer == key,
+                                    isCorrect = currentQuestion.answer == key,
+                                    showResult = quizState.showResult,
+                                    onClick = {
+                                        if (!quizState.showResult) {
+                                            viewModel.selectAnswer(key)
+                                        }
+                                    }
+                                )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
                         }
-                    },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = if (viewModel.isLastQuestion) "Ver Resultados" else "Siguiente",
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    }
                 }
-            } else {
-                Button(
-                    onClick = { viewModel.submitAnswer() },
-                    enabled = quizState.selectedAnswer != null,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp)
+            }
+
+            // Action Buttons
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(
-                        text = "Responder",
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    if (quizState.showResult) {
+                        Button(
+                            onClick = {
+                                if (viewModel.isLastQuestion) {
+                                    viewModel.nextQuestion() // This will trigger result screen
+                                } else {
+                                    viewModel.nextQuestion()
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            Text(
+                                text = if (viewModel.isLastQuestion) "Ver Resultados" else "Siguiente",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else {
+                        Button(
+                            onClick = { viewModel.submitAnswer() },
+                            enabled = quizState.selectedAnswer != null,
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            Text(
+                                text = "Responder",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                 }
             }
         }

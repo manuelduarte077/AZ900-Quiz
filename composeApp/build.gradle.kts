@@ -33,6 +33,9 @@ kotlin {
             // Kotlin Serialization
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
             
+            // Kotlin Coroutines
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+            
             // Ktor Client
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)

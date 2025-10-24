@@ -62,7 +62,7 @@ data class UserAnswer(
     val correctAnswer: String,
     val correctAnswers: List<String> = emptyList(),
     val isCorrect: Boolean,
-    val timeSpent: Int, // tiempo en segundos
+    val timeSpent: Int,
     val questionText: String,
     val questionType: QuestionType,
     val domain: ExamDomain

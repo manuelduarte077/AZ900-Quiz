@@ -9,7 +9,10 @@ import dev.donmanuel.az900quiz.data.QuizState
 import dev.donmanuel.az900quiz.data.UserAnswer
 import dev.donmanuel.az900quiz.data.ExamMode
 import dev.donmanuel.az900quiz.data.QuestionType
-import kotlin.js.js
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class QuizViewModel {
     var quizState by mutableStateOf(QuizState())
@@ -17,7 +20,7 @@ class QuizViewModel {
     var currentScreen by mutableStateOf(QuizScreen.START)
         private set
 
-    private var timerJob: dynamic = null
+    private var timerJob: kotlinx.coroutines.Job? = null
 
     fun loadQuestions(
         questions: List<Question>,
@@ -41,7 +44,7 @@ class QuizViewModel {
             timePerQuestion = timePerQuestion,
             timeRemaining = if (examMode == ExamMode.PRACTICE) timePerQuestion else 0,
             totalTimeRemaining = totalTime,
-            questionStartTime = getCurrentTime(),
+            questionStartTime = 0L,
             userAnswers = emptyList(),
             examMode = examMode
         )
@@ -62,7 +65,7 @@ class QuizViewModel {
             timePerQuestion = timePerQuestion,
             timeRemaining = if (examMode == ExamMode.PRACTICE) timePerQuestion else 0,
             totalTimeRemaining = totalTime,
-            questionStartTime = getCurrentTime(),
+            questionStartTime = 0L,
             userAnswers = emptyList(),
             examMode = examMode
         )
@@ -73,7 +76,6 @@ class QuizViewModel {
         if (quizState.examMode == ExamMode.PRACTICE) {
             quizState = quizState.copy(selectedAnswer = answer)
         } else {
-            // En modo examen real, solo guardamos la respuesta sin mostrar resultado inmediato
             quizState = quizState.copy(selectedAnswer = answer)
         }
     }
@@ -87,8 +89,7 @@ class QuizViewModel {
         val timeSpent = if (quizState.examMode == ExamMode.PRACTICE) {
             quizState.timePerQuestion - quizState.timeRemaining
         } else {
-            // En modo examen real, calculamos tiempo desde el inicio de la pregunta
-            ((getCurrentTime() - quizState.questionStartTime) / 1000).toInt()
+            0
         }
 
         val isCorrect = when (currentQuestion.questionType) {
@@ -141,7 +142,7 @@ class QuizViewModel {
                 selectedAnswers = emptyList(),
                 showResult = false,
                 timeRemaining = if (quizState.examMode == ExamMode.PRACTICE) quizState.timePerQuestion else 0,
-                questionStartTime = getCurrentTime()
+                questionStartTime = 0L
             )
             if (quizState.examMode == ExamMode.PRACTICE) {
                 startTimer()
@@ -159,7 +160,7 @@ class QuizViewModel {
             showResult = false,
             quizCompleted = false,
             timeRemaining = quizState.timePerQuestion,
-            questionStartTime = getCurrentTime(),
+            questionStartTime = 0L,
             userAnswers = emptyList()
         )
     }
@@ -171,39 +172,38 @@ class QuizViewModel {
 
     private fun startTimer() {
         stopTimer()
-        timerJob = js("setInterval").unsafeCast<(Any, Int) -> dynamic>().invoke({
-            when (quizState.examMode) {
-                ExamMode.PRACTICE -> {
-                    if (quizState.timeRemaining > 0 && !quizState.showResult) {
-                        quizState = quizState.copy(timeRemaining = quizState.timeRemaining - 1)
-                    } else if (quizState.timeRemaining <= 0 && !quizState.showResult) {
-                        submitAnswer()
+        timerJob = CoroutineScope(Dispatchers.Main).launch {
+            while (true) {
+                delay(1000)
+                when (quizState.examMode) {
+                    ExamMode.PRACTICE -> {
+                        if (quizState.timeRemaining > 0 && !quizState.showResult) {
+                            quizState = quizState.copy(timeRemaining = quizState.timeRemaining - 1)
+                        } else if (quizState.timeRemaining <= 0 && !quizState.showResult) {
+                            submitAnswer()
+                            break
+                        }
                     }
-                }
 
-                ExamMode.REAL_EXAM -> {
-                    if (quizState.totalTimeRemaining > 0) {
-                        quizState = quizState.copy(totalTimeRemaining = quizState.totalTimeRemaining - 1)
-                    } else {
-                        quizState = quizState.copy(quizCompleted = true)
-                        currentScreen = QuizScreen.RESULT
-                        stopTimer()
+                    ExamMode.REAL_EXAM -> {
+                        if (quizState.totalTimeRemaining > 0) {
+                            quizState = quizState.copy(totalTimeRemaining = quizState.totalTimeRemaining - 1)
+                        } else {
+                            quizState = quizState.copy(quizCompleted = true)
+                            currentScreen = QuizScreen.RESULT
+                            break
+                        }
                     }
                 }
             }
-        }, 1000)
-    }
-
-    private fun stopTimer() {
-        if (timerJob != null) {
-            js("clearInterval").unsafeCast<(dynamic) -> Unit>().invoke(timerJob)
-            timerJob = null
         }
     }
 
-    private fun getCurrentTime(): Long {
-        return js("Date.now").unsafeCast<() -> Double>().invoke().toLong()
+    private fun stopTimer() {
+        timerJob?.cancel()
+        timerJob = null
     }
+
 
     val currentQuestion: Question?
         get() = if (quizState.currentQuestionIndex < quizState.questions.size) {

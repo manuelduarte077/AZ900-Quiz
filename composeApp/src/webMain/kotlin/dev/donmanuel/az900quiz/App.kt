@@ -5,11 +5,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import dev.donmanuel.az900quiz.data.ExamMode
+import dev.donmanuel.az900quiz.data.QuizScreen
 import dev.donmanuel.az900quiz.screens.DetailedSummaryScreen
 import dev.donmanuel.az900quiz.screens.ErrorScreen
 import dev.donmanuel.az900quiz.screens.LoadingScreen
-import dev.donmanuel.az900quiz.screens.ResultScreen
 import dev.donmanuel.az900quiz.screens.StartScreen
 import dev.donmanuel.az900quiz.service.QuestionLoader
 

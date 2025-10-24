@@ -27,7 +27,8 @@ fun DetailedSummaryScreen(
     onBackToStart: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val percentage = if (totalQuestions > 0) (correctAnswers.size.toFloat() / totalQuestions.toFloat() * 100).toInt() else 0
+    val percentage =
+        if (totalQuestions > 0) (correctAnswers.size.toFloat() / totalQuestions.toFloat() * 100).toInt() else 0
     val passed = passedExam
 
     Box(
@@ -57,22 +58,21 @@ fun DetailedSummaryScreen(
                         modifier = Modifier.padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Status Icon
-                        Box(
-                            modifier = Modifier.size(80.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = if (passed) "🎉" else "📚",
-                                style = MaterialTheme.typography.displayLarge
-                            )
-                        }
+                        Icon(
+                            imageVector = if (passed) Icons.Default.Celebration else Icons.Default.Book,
+                            contentDescription = if (passed) "Felicitaciones" else "Sigue Practicando",
+                            tint = if (passed)
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            else
+                                MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(80.dp)
+                        )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
                             text = if (passed) "¡Felicitaciones!" else "Sigue Practicando",
-                            style = MaterialTheme.typography.displayMedium,
+                            style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.Bold,
                             color = if (passed)
                                 MaterialTheme.colorScheme.onPrimaryContainer
@@ -97,42 +97,40 @@ fun DetailedSummaryScreen(
 
                         // Score Circle
                         Box(
-                            modifier = Modifier.size(140.dp),
+                            modifier = Modifier.size(160.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
                                 progress = { percentage / 100f },
-                                modifier = Modifier.size(140.dp),
+                                modifier = Modifier.size(160.dp),
                                 color = if (passed)
                                     MaterialTheme.colorScheme.primary
                                 else
                                     MaterialTheme.colorScheme.error,
-                                strokeWidth = 12.dp,
+                                strokeWidth = 8.dp,
                                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
                                 strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
                             )
 
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "$examScore/1000",
-                                style = MaterialTheme.typography.displaySmall,
-                                fontWeight = FontWeight.Bold,
-                                color = if (passed)
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                else
-                                    MaterialTheme.colorScheme.onErrorContainer
-                            )
-                            Text(
-                                text = "${correctAnswers.size}/$totalQuestions ($percentage%)",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = if (passed)
-                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                else
-                                    MaterialTheme.colorScheme.onErrorContainer
-                            )
-                        }
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "$examScore/1000",
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (passed)
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    else
+                                        MaterialTheme.colorScheme.onErrorContainer
+                                )
+                                Text(
+                                    text = "${correctAnswers.size}/$totalQuestions ($percentage%)",
+                                    color = if (passed)
+                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                    else
+                                        MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(24.dp))
@@ -148,14 +146,14 @@ fun DetailedSummaryScreen(
                                 value = "${averageTime.toInt()}s",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
-                            
+
                             StatisticItem(
                                 icon = Icons.Default.CheckCircle,
                                 label = "Correctas",
                                 value = "${correctAnswers.size}",
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
-                            
+
                             StatisticItem(
                                 icon = Icons.Default.Error,
                                 label = "Incorrectas",
@@ -294,9 +292,9 @@ private fun AnswerSectionCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isCorrect) 
-                MaterialTheme.colorScheme.primaryContainer 
-            else 
+            containerColor = if (isCorrect)
+                MaterialTheme.colorScheme.primaryContainer
+            else
                 MaterialTheme.colorScheme.errorContainer
         )
     ) {
@@ -310,9 +308,9 @@ private fun AnswerSectionCard(
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
-                    tint = if (isCorrect) 
-                        MaterialTheme.colorScheme.primary 
-                    else 
+                    tint = if (isCorrect)
+                        MaterialTheme.colorScheme.primary
+                    else
                         MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(24.dp)
                 )
@@ -320,18 +318,18 @@ private fun AnswerSectionCard(
                     text = title,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCorrect) 
-                        MaterialTheme.colorScheme.onPrimaryContainer 
-                    else 
+                    color = if (isCorrect)
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    else
                         MaterialTheme.colorScheme.onErrorContainer
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "${answers.size} preguntas",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (isCorrect) 
-                        MaterialTheme.colorScheme.onPrimaryContainer 
-                    else 
+                    color = if (isCorrect)
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    else
                         MaterialTheme.colorScheme.onErrorContainer
                 )
             }
@@ -393,7 +391,7 @@ private fun AnswerDetailItem(
                         )
                     }
                 }
-                
+
                 Text(
                     text = "${answer.timeSpent}s",
                     style = MaterialTheme.typography.bodySmall,

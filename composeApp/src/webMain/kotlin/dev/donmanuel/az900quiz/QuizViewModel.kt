@@ -30,7 +30,7 @@ class QuizViewModel {
     ) {
         val limitedQuestions = questions.shuffled().take(questionCount)
         val totalTime =
-            if (examMode == ExamMode.REAL_EXAM) 90 * 60 else questionCount * timePerQuestion // 90 minutos en segundos
+            if (examMode == ExamMode.REAL_EXAM) 45 * 60 else questionCount * timePerQuestion // 45 minutos según documentación oficial
 
         quizState = quizState.copy(
             questions = limitedQuestions,
@@ -52,7 +52,7 @@ class QuizViewModel {
 
     fun startQuiz(questionCount: Int = 10, timePerQuestion: Int = 60, examMode: ExamMode = ExamMode.PRACTICE) {
         currentScreen = QuizScreen.QUIZ
-        val totalTime = if (examMode == ExamMode.REAL_EXAM) 90 * 60 else questionCount * timePerQuestion
+        val totalTime = if (examMode == ExamMode.REAL_EXAM) 45 * 60 else questionCount * timePerQuestion
 
         quizState = quizState.copy(
             currentQuestionIndex = 0,

@@ -49,10 +49,10 @@ fun StartScreen(
 ) {
     val questionCountOptions = listOf(10, 20, 30, 50, 60, 100)
     val timeOptions = listOf(30, 45, 60, 90, 120)
-    val examModeOptions = listOf(
-        ExamMode.PRACTICE to "Modo Práctica",
-        ExamMode.REAL_EXAM to "Examen Real (90 min)"
-    )
+        val examModeOptions = listOf(
+            ExamMode.PRACTICE to "Modo Práctica",
+            ExamMode.REAL_EXAM to "Examen Real (45 min)"
+        )
 
     var selectedQuestionCount by remember { mutableStateOf(questionCountOptions[0]) }
     var selectedTimePerQuestion by remember { mutableStateOf(timeOptions[2]) }
@@ -324,12 +324,12 @@ fun StartScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        text = "• 428 preguntas reales del AZ-900\n• Respuestas inmediatas\n• Progreso en tiempo real\n• Resultados detallados\n• Preguntas aleatorias cada vez",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        lineHeight = 28.sp
-                    )
+                        Text(
+                            text = "• 428 preguntas reales del AZ-900\n• Duración oficial: 45 minutos\n• Respuestas inmediatas\n• Progreso en tiempo real\n• Resultados detallados\n• Preguntas aleatorias cada vez",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            lineHeight = 28.sp
+                        )
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -345,10 +345,10 @@ fun StartScreen(
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                         Text(
-                            text = when (selectedExamMode) {
-                                ExamMode.PRACTICE -> "$selectedQuestionCount preguntas • ${selectedTimePerQuestion}s c/u"
-                                ExamMode.REAL_EXAM -> "$selectedQuestionCount preguntas • 90 minutos totales"
-                            },
+                                text = when (selectedExamMode) {
+                                    ExamMode.PRACTICE -> "$selectedQuestionCount preguntas • ${selectedTimePerQuestion}s c/u"
+                                    ExamMode.REAL_EXAM -> "$selectedQuestionCount preguntas • 45 minutos totales"
+                                },
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

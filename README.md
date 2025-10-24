@@ -2,16 +2,6 @@
 
 Una aplicación web interactiva para practicar el examen de certificación AZ-900 de Microsoft Azure, construida con Kotlin Multiplatform y Compose Multiplatform.
 
-## 🚀 Características
-
-- **428 preguntas reales** del examen AZ-900
-- **Carga dinámica** desde API externa
-- **Interfaz moderna** con Material Design 3
-- **Optimizado para WebAssembly** (Wasm)
-- **Responsive design** para todos los dispositivos
-- **Manejo de errores** robusto
-- **Pantallas de carga** y feedback visual
-
 ## 📦 Instalación y Desarrollo
 
 ### Desarrollo Local
@@ -21,10 +11,36 @@ Una aplicación web interactiva para practicar el examen de certificación AZ-90
 ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
 ```
 
+### Deploy a GitHub Pages
+
+El proyecto está configurado para deploy automático a GitHub Pages usando GitHub Actions.
+
+#### Configuración Inicial
+
+1. **Habilitar GitHub Pages** en tu repositorio:
+   - Ve a Settings → Pages
+   - Selecciona "GitHub Actions" como fuente
+
+2. **El workflow se ejecutará automáticamente** cuando hagas push a la rama `main`
+
+#### Deploy Manual
+
+```bash
+# Build local para GitHub Pages (opcional, para testing)
+./gradlew :composeApp:githubPagesBuild
+```
+
+#### URL de Deploy
+
+- **GitHub Pages**: `https://tu-usuario.github.io/AZ900-Quiz/`
+
 ## 📁 Estructura del Proyecto
 
 ```
 AZ900-Quiz/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml             # GitHub Actions para deploy
 ├── composeApp/
 │   ├── src/
 │   │   ├── webMain/kotlin/
@@ -38,7 +54,7 @@ AZ900-Quiz/
 │   └── build.gradle.kts           # Configuración Gradle
 ├── gradle/
 │   └── libs.versions.toml         # Versiones de dependencias
-├── vercel.json                    # Configuración Vercel
+├── .nojekyll                      # Configuración GitHub Pages
 ├── package.json                   # Scripts npm
 └── README.md                      # Documentación
 ```

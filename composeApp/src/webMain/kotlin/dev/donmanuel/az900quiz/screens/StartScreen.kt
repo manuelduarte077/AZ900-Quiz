@@ -39,16 +39,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.donmanuel.az900quiz.data.ExamMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartScreen(
-    onStartQuiz: (Int) -> Unit,
+    onStartQuiz: (Int, Int, ExamMode) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val questionCountOptions = listOf(10, 20, 30, 50, 60, 100)
+    val timeOptions = listOf(30, 45, 60, 90, 120)
+    val examModeOptions = listOf(
+        ExamMode.PRACTICE to "Modo Práctica",
+        ExamMode.REAL_EXAM to "Examen Real (90 min)"
+    )
+
     var selectedQuestionCount by remember { mutableStateOf(questionCountOptions[0]) }
-    var expanded by remember { mutableStateOf(false) }
+    var selectedTimePerQuestion by remember { mutableStateOf(timeOptions[2]) }
+    var selectedExamMode by remember { mutableStateOf(examModeOptions[0].first) }
+    var expandedQuestions by remember { mutableStateOf(false) }
+    var expandedTime by remember { mutableStateOf(false) }
+    var expandedMode by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -122,7 +133,7 @@ fun StartScreen(
 
                     // Question Count Selection
                     Text(
-                        text = "Selecciona la cantidad de preguntas:",
+                        text = "Configuración del Quiz:",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -131,16 +142,18 @@ fun StartScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Questions Count Dropdown
                     ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded }
+                        expanded = expandedQuestions,
+                        onExpandedChange = { expandedQuestions = !expandedQuestions }
                     ) {
                         OutlinedTextField(
                             value = "$selectedQuestionCount preguntas",
                             onValueChange = {},
                             readOnly = true,
+                            label = { Text("Cantidad de preguntas") },
                             trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedQuestions)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -153,8 +166,8 @@ fun StartScreen(
                         )
 
                         DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
+                            expanded = expandedQuestions,
+                            onDismissRequest = { expandedQuestions = false }
                         ) {
                             questionCountOptions.forEach { count ->
                                 DropdownMenuItem(
@@ -166,9 +179,103 @@ fun StartScreen(
                                     },
                                     onClick = {
                                         selectedQuestionCount = count
-                                        expanded = false
+                                        expandedQuestions = false
                                     }
                                 )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Exam Mode Dropdown
+                    ExposedDropdownMenuBox(
+                        expanded = expandedMode,
+                        onExpandedChange = { expandedMode = !expandedMode }
+                    ) {
+                        OutlinedTextField(
+                            value = examModeOptions.find { it.first == selectedExamMode }?.second ?: "Modo Práctica",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Modo de Examen") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedMode)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(MenuAnchorType.PrimaryEditable),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            )
+                        )
+
+                        DropdownMenu(
+                            expanded = expandedMode,
+                            onDismissRequest = { expandedMode = false }
+                        ) {
+                            examModeOptions.forEach { (mode, label) ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = label,
+                                            fontWeight = if (mode == selectedExamMode) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    },
+                                    onClick = {
+                                        selectedExamMode = mode
+                                        expandedMode = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Time Per Question Dropdown (solo en modo práctica)
+                    if (selectedExamMode == ExamMode.PRACTICE) {
+                        ExposedDropdownMenuBox(
+                            expanded = expandedTime,
+                            onExpandedChange = { expandedTime = !expandedTime }
+                        ) {
+                            OutlinedTextField(
+                                value = "${selectedTimePerQuestion}s por pregunta",
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Tiempo por pregunta") },
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTime)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(MenuAnchorType.PrimaryEditable),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                                )
+                            )
+
+                            DropdownMenu(
+                                expanded = expandedTime,
+                                onDismissRequest = { expandedTime = false }
+                            ) {
+                                timeOptions.forEach { time ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = "${time}s por pregunta",
+                                                fontWeight = if (time == selectedTimePerQuestion) FontWeight.Bold else FontWeight.Normal
+                                            )
+                                        },
+                                        onClick = {
+                                            selectedTimePerQuestion = time
+                                            expandedTime = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -176,7 +283,7 @@ fun StartScreen(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Button(
-                        onClick = { onStartQuiz(selectedQuestionCount) },
+                        onClick = { onStartQuiz(selectedQuestionCount, selectedTimePerQuestion, selectedExamMode) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(64.dp),
@@ -233,12 +340,15 @@ fun StartScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Quiz seleccionado: ",
+                            text = "Quiz configurado: ",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                         Text(
-                            text = "$selectedQuestionCount preguntas",
+                            text = when (selectedExamMode) {
+                                ExamMode.PRACTICE -> "$selectedQuestionCount preguntas • ${selectedTimePerQuestion}s c/u"
+                                ExamMode.REAL_EXAM -> "$selectedQuestionCount preguntas • 90 minutos totales"
+                            },
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary

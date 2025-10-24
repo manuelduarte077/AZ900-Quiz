@@ -5,7 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import dev.donmanuel.az900quiz.data.QuizScreen
+import dev.donmanuel.az900quiz.data.ExamMode
+import dev.donmanuel.az900quiz.screens.DetailedSummaryScreen
 import dev.donmanuel.az900quiz.screens.ErrorScreen
 import dev.donmanuel.az900quiz.screens.LoadingScreen
 import dev.donmanuel.az900quiz.screens.ResultScreen
@@ -63,9 +64,9 @@ fun App() {
                     when (currentScreen) {
                         QuizScreen.START -> {
                             StartScreen(
-                                onStartQuiz = { questionCount ->
-                                    viewModel.loadQuestions(allQuestions, questionCount)
-                                    viewModel.startQuiz(questionCount)
+                                onStartQuiz = { questionCount, timePerQuestion, examMode ->
+                                    viewModel.loadQuestions(allQuestions, questionCount, timePerQuestion, examMode)
+                                    viewModel.startQuiz(questionCount, timePerQuestion, examMode)
                                     currentScreen = QuizScreen.QUIZ
                                 }
                             )
@@ -88,9 +89,13 @@ fun App() {
                         }
 
                         QuizScreen.RESULT -> {
-                            ResultScreen(
-                                score = viewModel.quizState.score,
+                            DetailedSummaryScreen(
+                                correctAnswers = viewModel.correctAnswers,
+                                incorrectAnswers = viewModel.incorrectAnswers,
                                 totalQuestions = viewModel.quizState.questions.size,
+                                averageTime = viewModel.averageTimePerQuestion,
+                                examScore = viewModel.examScore,
+                                passedExam = viewModel.passedExam,
                                 onRestartQuiz = {
                                     viewModel.restartQuiz()
                                     currentScreen = QuizScreen.START

@@ -1,31 +1,13 @@
 package dev.donmanuel.az900quiz.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,8 +16,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.donmanuel.az900quiz.QuizViewModel
 import dev.donmanuel.az900quiz.composables.AnswerOption
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,11 +26,7 @@ fun QuizScreen(
     modifier: Modifier = Modifier
 ) {
     val quizState = viewModel.quizState
-    val currentQuestion = viewModel.currentQuestion
-
-    if (currentQuestion == null) {
-        return
-    }
+    val currentQuestion = viewModel.currentQuestion ?: return
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -70,7 +46,7 @@ fun QuizScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackToStart) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack, 
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
                             tint = MaterialTheme.colorScheme.onSurface
                         )
@@ -107,7 +83,7 @@ fun QuizScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Question Counter
+                    // Question Counter and Timer
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -119,13 +95,58 @@ fun QuizScreen(
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                        
-                        Text(
-                            text = "${(viewModel.progress * 100).toInt()}%",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Timer
+                            if (!quizState.showResult) {
+                                Icon(
+                                    imageVector = Icons.Default.Timer,
+                                    contentDescription = "Timer",
+                                    tint = when (quizState.examMode) {
+                                        dev.donmanuel.az900quiz.data.ExamMode.PRACTICE ->
+                                            if (quizState.timeRemaining <= 10)
+                                                MaterialTheme.colorScheme.error
+                                            else
+                                                MaterialTheme.colorScheme.onPrimaryContainer
+
+                                        dev.donmanuel.az900quiz.data.ExamMode.REAL_EXAM ->
+                                            if (quizState.totalTimeRemaining <= 300) // 5 minutos
+                                                MaterialTheme.colorScheme.error
+                                            else
+                                                MaterialTheme.colorScheme.onPrimaryContainer
+                                    },
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text(
+                                    text = viewModel.timeRemainingFormatted,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = when (quizState.examMode) {
+                                        dev.donmanuel.az900quiz.data.ExamMode.PRACTICE ->
+                                            if (quizState.timeRemaining <= 10)
+                                                MaterialTheme.colorScheme.error
+                                            else
+                                                MaterialTheme.colorScheme.onPrimaryContainer
+
+                                        dev.donmanuel.az900quiz.data.ExamMode.REAL_EXAM ->
+                                            if (quizState.totalTimeRemaining <= 300) // 5 minutos
+                                                MaterialTheme.colorScheme.error
+                                            else
+                                                MaterialTheme.colorScheme.onPrimaryContainer
+                                    }
+                                )
+                            }
+
+                            Text(
+                                text = "${(viewModel.progress * 100).toInt()}%",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }
@@ -180,6 +201,76 @@ fun QuizScreen(
                                 )
 
                                 Spacer(modifier = Modifier.height(16.dp))
+                            }
+
+                            // Immediate Feedback Section
+                            if (quizState.showResult) {
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                val lastAnswer = quizState.userAnswers.lastOrNull()
+                                val isCorrect = lastAnswer?.isCorrect ?: false
+                                val timeSpent = lastAnswer?.timeSpent ?: 0
+
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = if (isCorrect)
+                                            MaterialTheme.colorScheme.primaryContainer
+                                        else
+                                            MaterialTheme.colorScheme.errorContainer
+                                    ),
+                                    shape = RoundedCornerShape(16.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(20.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = if (isCorrect) Icons.Default.CheckCircle else Icons.Default.Error,
+                                            contentDescription = if (isCorrect) "Correcto" else "Incorrecto",
+                                            tint = if (isCorrect)
+                                                MaterialTheme.colorScheme.primary
+                                            else
+                                                MaterialTheme.colorScheme.error,
+                                            modifier = Modifier.size(32.dp)
+                                        )
+
+                                        Column(
+                                            modifier = Modifier.weight(1f)
+                                        ) {
+                                            Text(
+                                                text = if (isCorrect) "¡Correcto!" else "Incorrecto",
+                                                style = MaterialTheme.typography.titleLarge,
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (isCorrect)
+                                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                                else
+                                                    MaterialTheme.colorScheme.onErrorContainer
+                                            )
+
+                                            Text(
+                                                text = "Tiempo utilizado: ${timeSpent}s",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = if (isCorrect)
+                                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                                else
+                                                    MaterialTheme.colorScheme.onErrorContainer
+                                            )
+
+                                            if (!isCorrect) {
+                                                Text(
+                                                    text = "Respuesta correcta: ${currentQuestion.answer}",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

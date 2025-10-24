@@ -1,17 +1,8 @@
-# Ignore build directories that are not the final output
+# Vercel deployment files
 build/
-composeApp/build/
-gradle/
-kotlin-js-store/
-
-# Ignore development files
 .gradle/
-.idea/
+kotlin-js-store/
+local.properties
 *.iml
-
-# Ignore OS files
+.idea/
 .DS_Store
-Thumbs.db
-
-# Only include the final build output
-!composeApp/build/dist/wasmJs/productionExecutable/

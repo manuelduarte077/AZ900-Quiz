@@ -1,9 +1,34 @@
 {
   "version": 2,
-  "routes": [
+  "buildCommand": "./gradlew :composeApp:vercelBuild",
+  "outputDirectory": "build/wasm/packages/AZ900-Quiz-composeApp/kotlin",
+  "installCommand": "echo 'No install needed for Gradle project'",
+  "devCommand": "./gradlew :composeApp:wasmJsBrowserDevelopmentRun",
+  "framework": null,
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/composeApp/build/dist/wasmJs/productionExecutable/$1"
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*\\.wasm)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/wasm"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.mjs)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
     }
   ]
 }

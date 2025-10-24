@@ -56,4 +56,14 @@ kotlin {
     }
 }
 
+// Production build optimization
+tasks.named("wasmJsBrowserDistribution") {
+    dependsOn("wasmJsBrowserProductionWebpack")
+}
+
+// Ensure clean build for Vercel
+tasks.register("vercelBuild") {
+    dependsOn("clean", "wasmJsBrowserDistribution")
+    description = "Build optimized for Vercel deployment"
+}
 

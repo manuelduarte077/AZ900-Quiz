@@ -131,7 +131,7 @@ fun ErrorScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "• Verifica tu conexión a internet\n• La API puede estar temporalmente no disponible\n• Las preguntas se cargan desde GitHub\n• Intenta recargar la página si el problema persiste",
+                        text = "• La API puede estar temporalmente no disponible\n• Las preguntas se cargan desde GitHub\n• Intenta recargar la página si el problema persiste",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         lineHeight = 28.sp

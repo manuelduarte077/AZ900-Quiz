@@ -5,12 +5,6 @@
   "installCommand": "echo 'No install needed for Gradle project'",
   "devCommand": "./gradlew :composeApp:wasmJsBrowserDevelopmentRun",
   "framework": null,
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*\\.wasm)",

@@ -61,9 +61,60 @@ tasks.named("wasmJsBrowserDistribution") {
     dependsOn("wasmJsBrowserProductionWebpack")
 }
 
-// Ensure clean build for Vercel
-tasks.register("vercelBuild") {
+// GitHub Pages build task
+tasks.register("githubPagesBuild") {
     dependsOn("clean", "wasmJsBrowserDistribution")
-    description = "Build optimized for Vercel deployment"
+    description = "Build optimized for GitHub Pages deployment"
+    
+    doLast {
+        val webpackOutputDir = file("$buildDir/kotlin-webpack/wasmJs/productionExecutable")
+        val githubPagesDir = file("$rootDir/build/github-pages")
+        
+        // Create GitHub Pages directory
+        githubPagesDir.mkdirs()
+        
+        if (webpackOutputDir.exists()) {
+            // Copy all webpack output files (JS, WASM, source maps, licenses)
+            copy {
+                from(webpackOutputDir)
+                into(githubPagesDir)
+                include("*.js", "*.wasm", "*.map", "*.txt")
+            }
+            
+            // Copy HTML and CSS from wasm distribution
+            val wasmDistDir = file("$rootDir/build/wasm/packages/AZ900-Quiz-composeApp/kotlin")
+            if (wasmDistDir.exists()) {
+                copy {
+                    from(wasmDistDir)
+                    into(githubPagesDir)
+                    include("index.html", "styles.css")
+                }
+            }
+            
+            // Copy .nojekyll file to prevent Jekyll processing
+            val nojekyllFile = file("$rootDir/.nojekyll")
+            if (nojekyllFile.exists()) {
+                copy {
+                    from(nojekyllFile)
+                    into(githubPagesDir)
+                }
+            }
+            
+            // Verify essential files exist
+            val essentialFiles = listOf("composeApp.js", "index.html")
+            essentialFiles.forEach { fileName ->
+                val file = file("$githubPagesDir/$fileName")
+                if (!file.exists()) {
+                    throw GradleException("Essential file missing: $fileName")
+                }
+            }
+            
+            println("✅ GitHub Pages build completed successfully!")
+            println("📁 Files copied to: ${githubPagesDir.absolutePath}")
+            println("📄 Essential files verified: ${essentialFiles.joinToString(", ")}")
+        } else {
+            throw GradleException("❌ Webpack output directory not found: ${webpackOutputDir.absolutePath}")
+        }
+    }
 }
 

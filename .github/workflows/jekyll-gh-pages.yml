@@ -65,7 +65,7 @@ jobs:
         run: chmod +x ./gradlew
         
       - name: Build WASM application
-        run: ./gradlew :composeApp:wasmJsBrowserDistribution
+        run: ./gradlew :composeApp:wasmJsBrowserProductionWebpack
         
       - name: Setup Pages
         uses: actions/configure-pages@v5
